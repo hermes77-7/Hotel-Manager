@@ -1,0 +1,33 @@
+/* static/css/custom_admin.css */
+
+:root {
+    /* MAIN: Dark Brown */
+    --primary: #3E2723;         /* Header background */
+    --secondary: #4E342E;       /* Module headers and secondary elements */
+    --button-bg: #3E2723;       /* Standard buttons */
+
+    /* ACCENT: Gold */
+    --accent: #D4AF37;          /* Form highlighting */
+    --button-hover-bg: #D4AF37; /* Standard button hover state */
+    --default-button-bg: #D4AF37; /* Primary 'Save' buttons */
+    --default-button-hover-bg: #B5952F; /* Primary button hover */
+    --link-fg: #B5952F;         /* Standard links */
+    --link-hover-color: #D4AF37;/* Link hover state */
+    --link-selected-fg: #D4AF37;
+
+    /* SECONDARY: White */
+    --primary-fg: #FFFFFF;      /* Text inside the dark brown header */
+    --body-bg: #FFFFFF;         /* Main page background */
+    --body-fg: #333333;         /* Standard text color (dark gray for readability) */
+    --header-color: #FFFFFF;    /* Header text */
+    --header-branding-color: #FFFFFF; 
+    
+    /* Subtle background for selected rows to replace the default blue highlight */
+    --selected-bg: #FAF8F5;     
+    --selected-row: #FAF8F5;    
+}
+
+/* Optional: Add a slight gold border to inputs on focus */
+input:focus, textarea:focus, select:focus {
+    border-color: var(--accent);
+}
