@@ -1,0 +1,80 @@
+<div class="dialog-wrap">
+  <div class="dialog-header">
+    <div class="dialog-title-block">
+      <div class="dialog-icon">
+        <mat-icon>cleaning_services</mat-icon>
+      </div>
+      <div>
+        <h2 class="dialog-title">{{ isEdit ? 'Edit Task' : 'New Cleaning Task' }}</h2>
+        <p class="dialog-sub">{{ isEdit ? 'Update task details' : 'Assign a new housekeeping task' }}</p>
+      </div>
+    </div>
+    <button class="close-btn" (click)="onCancel()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <form [formGroup]="taskForm" class="dialog-body">
+
+    <div class="field-wrap">
+      <label class="field-label">Room <span class="required">*</span></label>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-select formControlName="room" placeholder="Select room">
+          <mat-option *ngFor="let r of rooms" [value]="r.id">
+            Room {{ r.number }} — {{ r.room_type_display }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="taskForm.get('room')?.hasError('required')">Required</mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <div class="field-wrap">
+        <label class="field-label">Task Type <span class="required">*</span></label>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-select formControlName="task_type" placeholder="Select type">
+            <mat-option *ngFor="let t of taskTypes" [value]="t.value">
+              {{ t.label }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="taskForm.get('task_type')?.hasError('required')">Required</mat-error>
+        </mat-form-field>
+      </div>
+      <div class="field-wrap">
+        <label class="field-label">Priority</label>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-select formControlName="priority">
+            <mat-option *ngFor="let p of priorities" [value]="p.value">
+              {{ p.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="field-wrap">
+      <label class="field-label">Scheduled For</label>
+      <mat-form-field appearance="outline" class="full-width">
+        <input matInput type="date" formControlName="scheduled_for"/>
+        <mat-icon matPrefix>calendar_today</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <div class="field-wrap">
+      <label class="field-label">Notes</label>
+      <mat-form-field appearance="outline" class="full-width">
+        <textarea matInput formControlName="notes" rows="3"
+                  placeholder="Special instructions..."></textarea>
+      </mat-form-field>
+    </div>
+
+  </form>
+
+  <div class="dialog-footer">
+    <button class="btn-cancel" (click)="onCancel()">Cancel</button>
+    <button class="btn-save" [disabled]="taskForm.invalid" (click)="onSave()">
+      <mat-icon>{{ isEdit ? 'save' : 'add' }}</mat-icon>
+      {{ isEdit ? 'Save Changes' : 'Create Task' }}
+    </button>
+  </div>
+</div>

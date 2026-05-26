@@ -1,0 +1,157 @@
+<div class="dialog-wrap">
+
+  <!-- Header -->
+  <div class="dialog-header">
+    <div class="dialog-title-block">
+      <div class="dialog-icon">
+        <mat-icon>{{ isEdit ? 'edit' : 'person_add' }}</mat-icon>
+      </div>
+      <div>
+        <h2 class="dialog-title">{{ isEdit ? 'Edit Customer' : 'New Customer' }}</h2>
+        <p class="dialog-sub">{{ isEdit ? 'Update customer details' : 'Register a new guest' }}</p>
+      </div>
+    </div>
+    <button class="close-btn" (click)="onCancel()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Body -->
+  <form [formGroup]="customerForm" class="dialog-body">
+
+    <!-- Section: Personal Info -->
+    <div class="form-section-label">Personal Information</div>
+
+    <div class="form-row">
+      <div class="field-wrap">
+        <label class="field-label">First Name <span class="required">*</span></label>
+        <mat-form-field appearance="outline" class="full-width">
+          <input matInput formControlName="first_name" placeholder="John"/>
+          <mat-error *ngIf="customerForm.get('first_name')?.hasError('required')">
+            Required
+          </mat-error>
+        </mat-form-field>
+      </div>
+      <div class="field-wrap">
+        <label class="field-label">Last Name <span class="required">*</span></label>
+        <mat-form-field appearance="outline" class="full-width">
+          <input matInput formControlName="last_name" placeholder="Smith"/>
+          <mat-error *ngIf="customerForm.get('last_name')?.hasError('required')">
+            Required
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="field-wrap">
+        <label class="field-label">Email <span class="required">*</span></label>
+        <mat-form-field appearance="outline" class="full-width">
+          <input matInput formControlName="email" placeholder="john@email.com"/>
+          <mat-icon matPrefix>mail_outline</mat-icon>
+          <mat-error *ngIf="customerForm.get('email')?.hasError('required')">Required</mat-error>
+          <mat-error *ngIf="customerForm.get('email')?.hasError('email')">Invalid email</mat-error>
+        </mat-form-field>
+      </div>
+      <div class="field-wrap">
+        <label class="field-label">Phone <span class="required">*</span></label>
+        <mat-form-field appearance="outline" class="full-width">
+          <input matInput formControlName="phone" placeholder="+1 555-0101"/>
+          <mat-icon matPrefix>phone</mat-icon>
+          <mat-error *ngIf="customerForm.get('phone')?.hasError('required')">Required</mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="field-wrap">
+        <label class="field-label">Gender</label>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-select formControlName="gender" placeholder="Select gender">
+            <mat-option value="">— Not specified —</mat-option>
+            <mat-option *ngFor="let g of genders" [value]="g.value">
+              {{ g.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div class="field-wrap">
+        <label class="field-label">Date of Birth</label>
+        <mat-form-field appearance="outline" class="full-width">
+          <input matInput type="date" formControlName="date_of_birth"/>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Section: ID Document -->
+    <div class="form-section-label">ID Document</div>
+
+    <div class="form-row">
+      <div class="field-wrap">
+        <label class="field-label">ID Type</label>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-select formControlName="id_type" placeholder="Select type">
+            <mat-option value="">— None —</mat-option>
+            <mat-option *ngFor="let t of idTypes" [value]="t.value">
+              {{ t.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div class="field-wrap">
+        <label class="field-label">ID Number</label>
+        <mat-form-field appearance="outline" class="full-width">
+          <input matInput formControlName="id_number" placeholder="A12345678"/>
+          <mat-icon matPrefix>badge</mat-icon>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Section: Address -->
+    <div class="form-section-label">Address</div>
+
+    <div class="form-row">
+      <div class="field-wrap">
+        <label class="field-label">City</label>
+        <mat-form-field appearance="outline" class="full-width">
+          <input matInput formControlName="city" placeholder="New York"/>
+        </mat-form-field>
+      </div>
+      <div class="field-wrap">
+        <label class="field-label">Country</label>
+        <mat-form-field appearance="outline" class="full-width">
+          <input matInput formControlName="country" placeholder="USA"/>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="field-wrap full">
+      <label class="field-label">Street Address</label>
+      <mat-form-field appearance="outline" class="full-width">
+        <input matInput formControlName="address" placeholder="123 Main St"/>
+      </mat-form-field>
+    </div>
+
+    <!-- Section: Notes -->
+    <div class="field-wrap full">
+      <label class="field-label">Notes</label>
+      <mat-form-field appearance="outline" class="full-width">
+        <textarea matInput formControlName="notes" rows="2"
+                  placeholder="Any special notes about this guest..."></textarea>
+      </mat-form-field>
+    </div>
+
+  </form>
+
+  <!-- Footer -->
+  <div class="dialog-footer">
+    <button class="btn-cancel" (click)="onCancel()">Cancel</button>
+    <button class="btn-save"
+            [disabled]="customerForm.invalid"
+            (click)="onSave()">
+      <mat-icon>{{ isEdit ? 'save' : 'person_add' }}</mat-icon>
+      {{ isEdit ? 'Save Changes' : 'Register Customer' }}
+    </button>
+  </div>
+
+</div>

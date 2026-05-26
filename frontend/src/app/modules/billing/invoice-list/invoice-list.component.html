@@ -1,0 +1,194 @@
+<div class="billing-page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Billing</h1>
+      <p class="page-sub">Track invoices and process guest payments</p>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-chip">
+      <span class="stat-number" style="color: var(--accent)">
+        {{ invoices.length }}
+      </span>
+      <span class="stat-label">Total Invoices</span>
+    </div>
+    <div class="stat-chip">
+      <span class="stat-number" style="color: #EF5350">
+        {{ getStatTotal('unpaid') }}
+      </span>
+      <span class="stat-label">Unpaid</span>
+    </div>
+    <div class="stat-chip">
+      <span class="stat-number" style="color: #FFA726">
+        {{ getStatTotal('partial') }}
+      </span>
+      <span class="stat-label">Partial</span>
+    </div>
+    <div class="stat-chip">
+      <span class="stat-number" style="color: #66BB6A">
+        {{ getStatTotal('paid') }}
+      </span>
+      <span class="stat-label">Paid</span>
+    </div>
+    
+    <div class="stat-chip">
+      <span class="stat-number" style="color: #EF5350">
+        ${{ getTotalOutstanding().toFixed(0) }}
+      </span>
+      <span class="stat-label">Outstanding</span>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-bar">
+    <mat-form-field appearance="outline" class="filter-field">
+      <mat-label>Search</mat-label>
+      <input matInput [(ngModel)]="searchQuery"
+             (ngModelChange)="applyFilters()"
+             placeholder="Guest name, room..."/>
+      <mat-icon matPrefix>search</mat-icon>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="filter-field">
+      <mat-label>Status</mat-label>
+      <mat-select [(ngModel)]="selectedStatus" (ngModelChange)="applyFilters()">
+        <mat-option value="">All Statuses</mat-option>
+        <mat-option *ngFor="let s of invoiceStatuses" [value]="s.value">
+          {{ s.label }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <button mat-stroked-button class="clear-btn" (click)="clearFilters()">
+      <mat-icon>clear</mat-icon>
+      Clear
+    </button>
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrap">
+    <table mat-table [dataSource]="invoices" class="invoices-table">
+
+      <!-- ID -->
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef>#</th>
+        <td mat-cell *matCellDef="let inv">
+          <span class="invoice-id">#{{ inv.id }}</span>
+        </td>
+      </ng-container>
+
+      <!-- Guest -->
+      <ng-container matColumnDef="guest">
+        <th mat-header-cell *matHeaderCellDef>Guest</th>
+        <td mat-cell *matCellDef="let inv">
+          <div class="guest-cell">
+            <div class="guest-avatar">
+              {{ inv.customer_detail?.first_name?.[0] }}{{ inv.customer_detail?.last_name?.[0] }}
+            </div>
+            <span class="guest-name">{{ inv.customer_detail?.full_name }}</span>
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- Room -->
+      <ng-container matColumnDef="room">
+        <th mat-header-cell *matHeaderCellDef>Room</th>
+        <td mat-cell *matCellDef="let inv">
+          <span class="room-badge">
+            {{ inv.booking_detail?.room_detail?.number }}
+          </span>
+        </td>
+      </ng-container>
+
+      <!-- Charges Breakdown -->
+      <ng-container matColumnDef="charges">
+        <th mat-header-cell *matHeaderCellDef>Charges</th>
+        <td mat-cell *matCellDef="let inv">
+          <div class="charges-cell">
+            <span class="charge-row">
+              <span class="charge-label">Room</span>
+              <span>${{ inv.room_charge }}</span>
+            </span>
+            <span class="charge-row" *ngIf="+inv.food_charge > 0">
+              <span class="charge-label">Food</span>
+              <span>${{ inv.food_charge }}</span>
+            </span>
+            <span class="charge-row" *ngIf="+inv.discount > 0">
+              <span class="charge-label discount">Discount</span>
+              <span class="discount">-${{ inv.discount }}</span>
+            </span>
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- Total -->
+      <ng-container matColumnDef="total">
+        <th mat-header-cell *matHeaderCellDef>Total</th>
+        <td mat-cell *matCellDef="let inv">
+          <span class="total-amount">${{ inv.total_amount }}</span>
+        </td>
+      </ng-container>
+
+      <!-- Paid -->
+      <ng-container matColumnDef="paid">
+        <th mat-header-cell *matHeaderCellDef>Paid</th>
+        <td mat-cell *matCellDef="let inv">
+          <span class="paid-amount">${{ inv.amount_paid }}</span>
+        </td>
+      </ng-container>
+
+      <!-- Balance -->
+      <ng-container matColumnDef="balance">
+        <th mat-header-cell *matHeaderCellDef>Balance</th>
+        <td mat-cell *matCellDef="let inv">
+          <span class="balance-amount"
+                [class.zero]="+inv.balance_due === 0">
+            ${{ inv.balance_due }}
+          </span>
+        </td>
+      </ng-container>
+
+      <!-- Status -->
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *matCellDef="let inv">
+          <span class="status-badge" [ngClass]="inv.status">
+            <span class="status-dot"></span>
+            {{ inv.status_display }}
+          </span>
+        </td>
+      </ng-container>
+
+      <!-- Actions -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let inv">
+          <div class="actions-cell">
+            <button mat-icon-button
+                    matTooltip="Record Payment"
+                    *ngIf="inv.status !== 'paid' && inv.status !== 'cancelled'"
+                    (click)="openPaymentDialog(inv)">
+              <mat-icon>payments</mat-icon>
+            </button>
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell no-data" [attr.colspan]="displayedColumns.length">
+          <mat-icon>receipt_long</mat-icon>
+          <p>No invoices found</p>
+        </td>
+      </tr>
+
+    </table>
+  </div>
+
+</div>

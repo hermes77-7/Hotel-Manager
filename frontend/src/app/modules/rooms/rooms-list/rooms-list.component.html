@@ -1,0 +1,145 @@
+<div class="rooms-page">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Room Management</h1>
+      <p class="page-sub">Manage all hotel rooms, availability and pricing</p>
+    </div>
+    <button mat-raised-button color="primary" (click)="openAddRoom()">
+      <mat-icon>add</mat-icon>
+      Add Room
+    </button>
+  </div>
+
+  <!-- Stats Row -->
+  <div class="stats-row">
+    <div class="stat-chip" *ngFor="let stat of roomStats">
+      <span class="stat-number" [style.color]="stat.color">{{ stat.count }}</span>
+      <span class="stat-label">{{ stat.label }}</span>
+    </div>
+  </div>
+
+  <!-- Filters -->
+    <div class="filters-bar">
+
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Search by room number</mat-label>
+        <input matInput [(ngModel)]="searchQuery"
+               (ngModelChange)="applyFilters()"
+               placeholder="e.g. 101"/>
+        <mat-icon matPrefix>search</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Filter by Status</mat-label>
+        <mat-select [(ngModel)]="selectedStatus" (ngModelChange)="applyFilters()">
+          <mat-option value="">All Statuses</mat-option>
+          <mat-option *ngFor="let s of roomStatuses" [value]="s.value">
+            {{ s.label }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Filter by Type</mat-label>
+        <mat-select [(ngModel)]="selectedType" (ngModelChange)="applyFilters()">
+          <mat-option value="">All Types</mat-option>
+          <mat-option *ngFor="let t of roomTypes" [value]="t.value">
+            {{ t.label }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <button mat-stroked-button (click)="clearFilters()">
+        <mat-icon>clear</mat-icon>
+        Clear
+      </button>
+
+    </div>
+
+  <!-- Table -->
+  <div class="table-wrap">
+    <table mat-table [dataSource]="rooms" class="rooms-table">
+
+      <ng-container matColumnDef="number">
+        <th mat-header-cell *matHeaderCellDef>Room</th>
+        <td mat-cell *matCellDef="let room">
+          <div class="room-number-cell">
+            <span class="room-badge">{{ room.number }}</span>
+          </div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="room_type">
+        <th mat-header-cell *matHeaderCellDef>Type</th>
+        <td mat-cell *matCellDef="let room">
+          <span class="type-text">{{ room.room_type_display }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="floor">
+        <th mat-header-cell *matHeaderCellDef>Floor</th>
+        <td mat-cell *matCellDef="let room">
+          <span class="floor-text">{{ room.floor }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="capacity">
+        <th mat-header-cell *matHeaderCellDef>Capacity</th>
+        <td mat-cell *matCellDef="let room">
+          <div class="capacity-cell">
+            <mat-icon>person</mat-icon>
+            <span>{{ room.capacity }}</span>
+          </div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="price">
+        <th mat-header-cell *matHeaderCellDef>Price / Night</th>
+        <td mat-cell *matCellDef="let room">
+          <span class="price-text">${{ room.price }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *matCellDef="let room">
+          <span class="status-badge" [ngClass]="room.status">
+            <span class="status-dot"></span>
+            {{ room.status_display }}
+          </span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let room">
+          <div class="actions-cell">
+            <button mat-icon-button
+                    (click)="openEditRoom(room)">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button
+                    color="warn"
+                    (click)="deleteRoom(room)">
+              <mat-icon>delete_outline</mat-icon>
+            </button>
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell no-data" [attr.colspan]="displayedColumns.length">
+          <mat-icon>search_off</mat-icon>
+          <p>No rooms found</p>
+        </td>
+      </tr>
+
+    </table>
+  </div>
+
+</div>

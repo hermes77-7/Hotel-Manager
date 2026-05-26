@@ -1,0 +1,112 @@
+<div class="dashboard">
+
+  <!-- Welcome -->
+  <div class="welcome-block">
+    <div class="welcome-text">
+      <p class="welcome-label">Good day,</p>
+      <h1 class="welcome-name">{{ currentUser?.username }}</h1>
+      <p class="welcome-sub">Here's your hotel overview right now.</p>
+    </div>
+    <div class="welcome-right">
+      <span class="badge-role">{{ currentUser?.role }}</span>
+      <button class="refresh-btn" (click)="loadStats()">
+        <mat-icon>refresh</mat-icon>
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-state" *ngIf="isLoading">
+    <mat-icon class="spin">autorenew</mat-icon>
+    <p>Loading dashboard data...</p>
+  </div>
+
+  <!-- Occupancy Bar -->
+  <div class="occupancy-bar-wrap" *ngIf="stats">
+    <div class="occupancy-label">
+      <span>Occupancy Rate</span>
+      <span class="occupancy-rate">{{ stats.rooms.occupancy_rate }}%</span>
+    </div>
+    <div class="occupancy-track">
+      <div class="occupancy-fill"
+           [style.width.%]="stats.rooms.occupancy_rate">
+      </div>
+    </div>
+    <div class="occupancy-sub">
+      {{ stats.rooms.occupied }} of {{ stats.rooms.total }} rooms occupied
+    </div>
+  </div>
+
+  <!-- Divider -->
+  <div class="section-divider">
+    <span class="divider-line"></span>
+    <span class="divider-label">Live Overview</span>
+    <span class="divider-line"></span>
+  </div>
+
+  <!-- Stats Grid -->
+  <div class="stats-grid" *ngIf="!isLoading">
+    <div class="stat-card" *ngFor="let stat of statCards"
+         [routerLink]="stat.route">
+      <div class="stat-top">
+        <span class="stat-label">{{ stat.label }}</span>
+        <div class="stat-icon-wrap" [style.background]="stat.iconBg">
+          <mat-icon [style.color]="stat.iconColor">{{ stat.icon }}</mat-icon>
+        </div>
+      </div>
+      <div class="stat-value">{{ stat.value }}</div>
+      <div class="stat-footer">
+        <span class="stat-hint">{{ stat.sub }}</span>
+        <mat-icon class="stat-arrow">arrow_forward</mat-icon>
+      </div>
+    </div>
+  </div>
+
+  <!-- Today's Activity -->
+  <div class="section-divider" *ngIf="stats">
+    <span class="divider-line"></span>
+    <span class="divider-label">Today's Activity</span>
+    <span class="divider-line"></span>
+  </div>
+
+  <div class="activity-row" *ngIf="stats">
+    <div class="activity-card">
+      <div class="activity-icon" style="background: rgba(46,125,50,0.1)">
+        <mat-icon style="color: #66BB6A">login</mat-icon>
+      </div>
+      <div class="activity-info">
+        <span class="activity-value">{{ stats.bookings.todays_checkins }}</span>
+        <span class="activity-label">Check-ins Today</span>
+      </div>
+    </div>
+    <div class="activity-card">
+      <div class="activity-icon" style="background: rgba(198,40,40,0.1)">
+        <mat-icon style="color: #EF5350">logout</mat-icon>
+      </div>
+      <div class="activity-info">
+        <span class="activity-value">{{ stats.bookings.todays_checkouts }}</span>
+        <span class="activity-label">Check-outs Today</span>
+      </div>
+    </div>
+    <div class="activity-card">
+      <div class="activity-icon" style="background: rgba(230,81,0,0.1)">
+        <mat-icon style="color: #FFA726">restaurant</mat-icon>
+      </div>
+      <div class="activity-info">
+        <span class="activity-value">{{ stats.food.pending_orders }}</span>
+        <span class="activity-label">Pending Food Orders</span>
+      </div>
+    </div>
+    <div class="activity-card">
+      <div class="activity-icon" style="background: rgba(0,105,92,0.1)">
+        <mat-icon style="color: #26A69A">cleaning_services</mat-icon>
+      </div>
+      <div class="activity-info">
+        <span class="activity-value">{{ stats.housekeeping.pending_tasks }}</span>
+        <span class="activity-label">Cleaning Tasks</span>
+      </div>
+    </div>
+  </div>
+
+</div>

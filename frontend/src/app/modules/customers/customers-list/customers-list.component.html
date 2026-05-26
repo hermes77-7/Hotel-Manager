@@ -1,0 +1,157 @@
+<div class="customers-page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Customers</h1>
+      <p class="page-sub">Manage guest profiles and contact information</p>
+    </div>
+    <button mat-raised-button color="primary" (click)="openAddCustomer()">
+      <mat-icon>person_add</mat-icon>
+      Add Customer
+    </button>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-chip">
+      <span class="stat-number" style="color: var(--accent)">{{ customers.length }}</span>
+      <span class="stat-label">Total Guests</span>
+    </div>
+    <div class="stat-chip">
+      <span class="stat-number" style="color: #66BB6A">
+        {{ customers | countBy:'gender':'male' }}
+      </span>
+      <span class="stat-label">Male</span>
+    </div>
+    <div class="stat-chip">
+      <span class="stat-number" style="color: #AB47BC">
+        {{ customers | countBy:'gender':'female' }}
+      </span>
+      <span class="stat-label">Female</span>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-bar">
+    <mat-form-field appearance="outline" class="filter-field">
+      <mat-label>Search</mat-label>
+      <input matInput [(ngModel)]="searchQuery"
+             (ngModelChange)="applyFilters()"
+             placeholder="Name, email, phone..."/>
+      <mat-icon matPrefix>search</mat-icon>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="filter-field">
+      <mat-label>Gender</mat-label>
+      <mat-select [(ngModel)]="selectedGender" (ngModelChange)="applyFilters()">
+        <mat-option value="">All</mat-option>
+        <mat-option *ngFor="let g of genders" [value]="g.value">
+          {{ g.label }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="filter-field">
+      <mat-label>Country</mat-label>
+      <input matInput [(ngModel)]="selectedCountry"
+             (ngModelChange)="applyFilters()"
+             placeholder="e.g. France"/>
+    </mat-form-field>
+
+    <button mat-stroked-button class="clear-btn" (click)="clearFilters()">
+      <mat-icon>clear</mat-icon>
+      Clear
+    </button>
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrap">
+    <table mat-table [dataSource]="customers" class="customers-table">
+
+      <!-- Name -->
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Guest</th>
+        <td mat-cell *matCellDef="let c">
+          <div class="name-cell">
+            <div class="avatar">{{ getInitials(c) }}</div>
+            <div class="name-info">
+              <span class="full-name">{{ c.full_name }}</span>
+              <span class="gender-tag" *ngIf="c.gender_display">
+                {{ c.gender_display }}
+              </span>
+            </div>
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- Email -->
+      <ng-container matColumnDef="email">
+        <th mat-header-cell *matHeaderCellDef>Email</th>
+        <td mat-cell *matCellDef="let c">
+          <span class="subtle-text">{{ c.email }}</span>
+        </td>
+      </ng-container>
+
+      <!-- Phone -->
+      <ng-container matColumnDef="phone">
+        <th mat-header-cell *matHeaderCellDef>Phone</th>
+        <td mat-cell *matCellDef="let c">
+          <span class="subtle-text">{{ c.phone }}</span>
+        </td>
+      </ng-container>
+
+      <!-- Location -->
+      <ng-container matColumnDef="location">
+        <th mat-header-cell *matHeaderCellDef>Location</th>
+        <td mat-cell *matCellDef="let c">
+          <div class="location-cell" *ngIf="c.city || c.country">
+            <mat-icon>location_on</mat-icon>
+            <span>{{ c.city }}{{ c.city && c.country ? ', ' : '' }}{{ c.country }}</span>
+          </div>
+          <span class="subtle-text" *ngIf="!c.city && !c.country">—</span>
+        </td>
+      </ng-container>
+
+      <!-- ID Document -->
+      <ng-container matColumnDef="id_doc">
+        <th mat-header-cell *matHeaderCellDef>ID Document</th>
+        <td mat-cell *matCellDef="let c">
+          <div class="id-cell" *ngIf="c.id_type">
+            <span class="id-type-badge">{{ c.id_type_display }}</span>
+            <span class="id-number">{{ c.id_number }}</span>
+          </div>
+          <span class="subtle-text" *ngIf="!c.id_type">—</span>
+        </td>
+      </ng-container>
+
+      <!-- Actions -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let c">
+          <div class="actions-cell">
+            <button mat-icon-button (click)="openEditCustomer(c)">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button
+                    color="warn" (click)="deleteCustomer(c)">
+              <mat-icon>delete_outline</mat-icon>
+            </button>
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell no-data" [attr.colspan]="displayedColumns.length">
+          <mat-icon>person_search</mat-icon>
+          <p>No customers found</p>
+        </td>
+      </tr>
+
+    </table>
+  </div>
+
+</div>

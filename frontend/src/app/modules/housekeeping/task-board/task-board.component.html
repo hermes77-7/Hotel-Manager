@@ -1,0 +1,355 @@
+<div class="housekeeping-page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Housekeeping</h1>
+      <p class="page-sub">Manage cleaning tasks, inspections and supply tracking</p>
+    </div>
+  </div>
+
+  <mat-tab-group class="hk-tabs" animationDuration="200ms">
+
+    <!-- ── Tab 1: Task Board ── -->
+    <mat-tab label="🧹  Tasks">
+      <div class="tab-content">
+
+        <!-- Stats -->
+        <div class="stats-row">
+          <div class="stat-chip">
+            <span class="stat-number" style="color: var(--accent)">{{ tasks.length }}</span>
+            <span class="stat-label">Total</span>
+          </div>
+          <div class="stat-chip">
+            <span class="stat-number" style="color: #FFA726">{{ getTaskCount('pending') }}</span>
+            <span class="stat-label">Pending</span>
+          </div>
+          <div class="stat-chip">
+            <span class="stat-number" style="color: #42A5F5">{{ getTaskCount('in_progress') }}</span>
+            <span class="stat-label">In Progress</span>
+          </div>
+          <div class="stat-chip">
+            <span class="stat-number" style="color: #66BB6A">{{ getTaskCount('completed') }}</span>
+            <span class="stat-label">Completed</span>
+          </div>
+          <div class="stat-chip">
+            <span class="stat-number" style="color: #AB47BC">{{ getTaskCount('inspected') }}</span>
+            <span class="stat-label">Inspected</span>
+          </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-bar">
+          <mat-form-field appearance="outline" class="filter-field">
+            <mat-label>Search</mat-label>
+            <input matInput [(ngModel)]="taskSearch"
+                   (ngModelChange)="loadTasks()"
+                   placeholder="Room number..."/>
+            <mat-icon matPrefix>search</mat-icon>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="filter-field">
+            <mat-label>Status</mat-label>
+            <mat-select [(ngModel)]="selectedStatus" (ngModelChange)="loadTasks()">
+              <mat-option value="">All</mat-option>
+              <mat-option *ngFor="let s of taskStatuses" [value]="s.value">
+                {{ s.label }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="filter-field">
+            <mat-label>Priority</mat-label>
+            <mat-select [(ngModel)]="selectedPriority" (ngModelChange)="loadTasks()">
+              <mat-option value="">All</mat-option>
+              <mat-option *ngFor="let p of taskPriorities" [value]="p.value">
+                {{ p.label }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+          <button mat-raised-button color="primary" (click)="openAddTask()">
+            <mat-icon>add</mat-icon>
+            New Task
+          </button>
+        </div>
+
+        <!-- Tasks Table -->
+        <div class="table-wrap">
+          <table mat-table [dataSource]="tasks" class="tasks-table">
+
+            <ng-container matColumnDef="room">
+              <th mat-header-cell *matHeaderCellDef>Room</th>
+              <td mat-cell *matCellDef="let t">
+                <span class="room-badge">{{ t.room_detail?.number }}</span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="task_type">
+              <th mat-header-cell *matHeaderCellDef>Task Type</th>
+              <td mat-cell *matCellDef="let t">
+                <span class="task-type">{{ t.task_type_display }}</span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="priority">
+              <th mat-header-cell *matHeaderCellDef>Priority</th>
+              <td mat-cell *matCellDef="let t">
+                <span class="priority-badge" [ngClass]="t.priority">
+                  {{ t.priority_display }}
+                </span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="scheduled">
+              <th mat-header-cell *matHeaderCellDef>Scheduled</th>
+              <td mat-cell *matCellDef="let t">
+                <span class="date-text" *ngIf="t.scheduled_for">
+                  {{ t.scheduled_for | date:'MMM d, y' }}
+                </span>
+                <span class="subtle-text" *ngIf="!t.scheduled_for">—</span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef>Status</th>
+              <td mat-cell *matCellDef="let t">
+                <span class="status-badge" [ngClass]="t.status">
+                  <span class="status-dot"></span>
+                  {{ t.status_display }}
+                </span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef></th>
+              <td mat-cell *matCellDef="let t">
+                <div class="actions-cell">
+                  <button mat-icon-button matTooltip="Start Task"
+                          *ngIf="t.status === 'pending'"
+                          (click)="startTask(t)">
+                    <mat-icon>play_arrow</mat-icon>
+                  </button>
+                  <button mat-icon-button matTooltip="Mark Complete"
+                          *ngIf="t.status === 'in_progress'"
+                          (click)="completeTask(t)">
+                    <mat-icon>check</mat-icon>
+                  </button>
+                  <button mat-icon-button matTooltip="Mark Inspected"
+                          *ngIf="t.status === 'completed'"
+                          (click)="inspectTask(t)">
+                    <mat-icon>verified</mat-icon>
+                  </button>
+                  <button mat-icon-button matTooltip="Edit"
+                          *ngIf="t.status === 'pending'"
+                          (click)="openEditTask(t)">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button mat-icon-button color="warn" matTooltip="Delete"
+                          (click)="deleteTask(t)">
+                    <mat-icon>delete_outline</mat-icon>
+                  </button>
+                </div>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="taskColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: taskColumns;"></tr>
+            <tr class="mat-row" *matNoDataRow>
+              <td class="mat-cell no-data" [attr.colspan]="taskColumns.length">
+                <mat-icon>cleaning_services</mat-icon>
+                <p>No tasks found</p>
+              </td>
+            </tr>
+
+          </table>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- ── Tab 2: Hygiene Reports ── -->
+    <mat-tab label="🔍  Inspections">
+      <div class="tab-content">
+
+        <!-- Report Stats -->
+        <div class="stats-row">
+          <div class="stat-chip">
+            <span class="stat-number" style="color: var(--accent)">{{ reports.length }}</span>
+            <span class="stat-label">Total Reports</span>
+          </div>
+          <div class="stat-chip">
+            <span class="stat-number" style="color: #66BB6A">
+              {{ reports | countPassed:true }}
+            </span>
+            <span class="stat-label">Passed</span>
+          </div>
+          <div class="stat-chip">
+            <span class="stat-number" style="color: #EF5350">
+              {{ reports | countPassed:false }}
+            </span>
+            <span class="stat-label">Failed</span>
+          </div>
+          <div class="stat-chip">
+            <span class="stat-number" style="color: #42A5F5">{{ getPassRate() }}%</span>
+            <span class="stat-label">Pass Rate</span>
+          </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-bar">
+          <mat-form-field appearance="outline" class="filter-field">
+            <mat-label>Rating</mat-label>
+            <mat-select [(ngModel)]="selectedRating" (ngModelChange)="loadReports()">
+              <mat-option value="">All Ratings</mat-option>
+              <mat-option value="excellent">Excellent</mat-option>
+              <mat-option value="good">Good</mat-option>
+              <mat-option value="fair">Fair</mat-option>
+              <mat-option value="poor">Poor</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <button mat-raised-button color="primary" (click)="openAddReport()">
+            <mat-icon>add</mat-icon>
+            New Report
+          </button>
+        </div>
+
+        <!-- Reports Table -->
+        <div class="table-wrap">
+          <table mat-table [dataSource]="reports" class="reports-table">
+
+            <ng-container matColumnDef="room">
+              <th mat-header-cell *matHeaderCellDef>Room</th>
+              <td mat-cell *matCellDef="let r">
+                <span class="room-badge">{{ r.room_detail?.number }}</span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="rating">
+              <th mat-header-cell *matHeaderCellDef>Rating</th>
+              <td mat-cell *matCellDef="let r">
+                <span class="rating-badge" [ngClass]="r.rating">
+                  {{ r.rating_display }}
+                </span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="passed">
+              <th mat-header-cell *matHeaderCellDef>Result</th>
+              <td mat-cell *matCellDef="let r">
+                <span class="pass-badge" [ngClass]="r.passed ? 'pass' : 'fail'">
+                  <mat-icon>{{ r.passed ? 'check_circle' : 'cancel' }}</mat-icon>
+                  {{ r.passed ? 'Passed' : 'Failed' }}
+                </span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="issues">
+              <th mat-header-cell *matHeaderCellDef>Issues</th>
+              <td mat-cell *matCellDef="let r">
+                <span class="issues-text" *ngIf="r.issues_found">{{ r.issues_found }}</span>
+                <span class="subtle-text" *ngIf="!r.issues_found">None</span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="date">
+              <th mat-header-cell *matHeaderCellDef>Inspected</th>
+              <td mat-cell *matCellDef="let r">
+                <span class="date-text">{{ r.inspected_at | date:'MMM d, y' }}</span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef></th>
+              <td mat-cell *matCellDef="let r">
+                <button mat-icon-button color="warn" matTooltip="Delete"
+                        (click)="deleteReport(r)">
+                  <mat-icon>delete_outline</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="reportColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: reportColumns;"></tr>
+            <tr class="mat-row" *matNoDataRow>
+              <td class="mat-cell no-data" [attr.colspan]="reportColumns.length">
+                <mat-icon>fact_check</mat-icon>
+                <p>No inspection reports found</p>
+              </td>
+            </tr>
+
+          </table>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- ── Tab 3: Supply Logs ── -->
+    <mat-tab label="📦  Supplies">
+      <div class="tab-content">
+
+        <div class="filters-bar">
+          <span class="supply-total">
+            {{ supplies.length }} supply logs recorded
+          </span>
+          <button mat-raised-button color="primary" (click)="openLogSupply()">
+            <mat-icon>add</mat-icon>
+            Log Supply
+          </button>
+        </div>
+
+        <div class="table-wrap">
+          <table mat-table [dataSource]="supplies" class="supplies-table">
+
+            <ng-container matColumnDef="item">
+              <th mat-header-cell *matHeaderCellDef>Item</th>
+              <td mat-cell *matCellDef="let s">
+                <span class="item-name">{{ s.item_name }}</span>
+                <div class="item-notes" *ngIf="s.notes">{{ s.notes }}</div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="quantity">
+              <th mat-header-cell *matHeaderCellDef>Quantity</th>
+              <td mat-cell *matCellDef="let s">
+                <span class="qty-text">{{ s.quantity }} {{ s.unit }}</span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="room">
+              <th mat-header-cell *matHeaderCellDef>Room</th>
+              <td mat-cell *matCellDef="let s">
+                <span class="room-badge" *ngIf="s.room_number">{{ s.room_number }}</span>
+                <span class="subtle-text" *ngIf="!s.room_number">General</span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="date">
+              <th mat-header-cell *matHeaderCellDef>Logged</th>
+              <td mat-cell *matCellDef="let s">
+                <span class="date-text">{{ s.logged_at | date:'MMM d, y' }}</span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef></th>
+              <td mat-cell *matCellDef="let s">
+                <button mat-icon-button color="warn" matTooltip="Delete"
+                        (click)="deleteSupply(s)">
+                  <mat-icon>delete_outline</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="supplyColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: supplyColumns;"></tr>
+            <tr class="mat-row" *matNoDataRow>
+              <td class="mat-cell no-data" [attr.colspan]="supplyColumns.length">
+                <mat-icon>inventory_2</mat-icon>
+                <p>No supply logs found</p>
+              </td>
+            </tr>
+
+          </table>
+        </div>
+      </div>
+    </mat-tab>
+
+  </mat-tab-group>
+
+</div>

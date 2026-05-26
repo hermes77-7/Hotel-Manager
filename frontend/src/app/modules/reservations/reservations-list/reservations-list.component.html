@@ -1,0 +1,202 @@
+<div class="reservations-page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Reservations</h1>
+      <p class="page-sub">Manage all guest bookings and check-ins</p>
+    </div>
+    <button mat-raised-button color="primary" (click)="openAddBooking()">
+      <mat-icon>add</mat-icon>
+      New Reservation
+    </button>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-chip">
+      <span class="stat-number" style="color: var(--accent)">{{ bookings.length }}</span>
+      <span class="stat-label">Total</span>
+    </div>
+    <div class="stat-chip">
+      <span class="stat-number" style="color: #42A5F5">{{ getStatCount('confirmed') }}</span>
+      <span class="stat-label">Confirmed</span>
+    </div>
+    <div class="stat-chip">
+      <span class="stat-number" style="color: #66BB6A">{{ getStatCount('checked_in') }}</span>
+      <span class="stat-label">Checked In</span>
+    </div>
+    <div class="stat-chip">
+      <span class="stat-number" style="color: #9E9E9E">{{ getStatCount('checked_out') }}</span>
+      <span class="stat-label">Checked Out</span>
+    </div>
+    <div class="stat-chip">
+      <span class="stat-number" style="color: #EF5350">{{ getStatCount('cancelled') }}</span>
+      <span class="stat-label">Cancelled</span>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-bar">
+    <mat-form-field appearance="outline" class="filter-field">
+      <mat-label>Search</mat-label>
+      <input matInput [(ngModel)]="searchQuery"
+             (ngModelChange)="applyFilters()"
+             placeholder="Guest name, room number..."/>
+      <mat-icon matPrefix>search</mat-icon>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="filter-field">
+      <mat-label>Status</mat-label>
+      <mat-select [(ngModel)]="selectedStatus" (ngModelChange)="applyFilters()">
+        <mat-option value="">All Statuses</mat-option>
+        <mat-option *ngFor="let s of bookingStatuses" [value]="s.value">
+          {{ s.label }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <button mat-stroked-button class="clear-btn" (click)="clearFilters()">
+      <mat-icon>clear</mat-icon>
+      Clear
+    </button>
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrap">
+    <table mat-table [dataSource]="bookings" class="bookings-table">
+
+      <!-- ID -->
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef>#</th>
+        <td mat-cell *matCellDef="let b">
+          <span class="booking-id">#{{ b.id }}</span>
+        </td>
+      </ng-container>
+
+      <!-- Guest -->
+      <ng-container matColumnDef="guest">
+        <th mat-header-cell *matHeaderCellDef>Guest</th>
+        <td mat-cell *matCellDef="let b">
+          <div class="guest-cell">
+            <div class="guest-avatar">
+              {{ b.customer_detail?.first_name?.[0] }}{{ b.customer_detail?.last_name?.[0] }}
+            </div>
+            <div>
+              <div class="guest-name">{{ b.customer_detail?.full_name }}</div>
+              <div class="guest-meta">
+                {{ b.adults }} adult{{ b.adults > 1 ? 's' : '' }}
+                <span *ngIf="b.children > 0">, {{ b.children }} child{{ b.children > 1 ? 'ren' : '' }}</span>
+              </div>
+            </div>
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- Room -->
+      <ng-container matColumnDef="room">
+        <th mat-header-cell *matHeaderCellDef>Room</th>
+        <td mat-cell *matCellDef="let b">
+          <div class="room-cell">
+            <span class="room-badge">{{ b.room_detail?.number }}</span>
+            <span class="room-type">{{ b.room_detail?.room_type_display }}</span>
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- Dates -->
+      <ng-container matColumnDef="dates">
+        <th mat-header-cell *matHeaderCellDef>Dates</th>
+        <td mat-cell *matCellDef="let b">
+          <div class="dates-cell">
+            <div class="date-row">
+              <mat-icon>login</mat-icon>
+              <span>{{ b.check_in | date:'MMM d, y' }}</span>
+            </div>
+            <div class="date-row">
+              <mat-icon>logout</mat-icon>
+              <span>{{ b.check_out | date:'MMM d, y' }}</span>
+            </div>
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- Duration -->
+      <ng-container matColumnDef="duration">
+        <th mat-header-cell *matHeaderCellDef>Nights</th>
+        <td mat-cell *matCellDef="let b">
+          <span class="duration-badge">{{ b.duration }}</span>
+        </td>
+      </ng-container>
+
+      <!-- Total -->
+      <ng-container matColumnDef="total">
+        <th mat-header-cell *matHeaderCellDef>Total</th>
+        <td mat-cell *matCellDef="let b">
+          <span class="total-price">${{ b.total_price }}</span>
+        </td>
+      </ng-container>
+
+      <!-- Status -->
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *matCellDef="let b">
+          <span class="status-badge" [ngClass]="b.status">
+            <span class="status-dot"></span>
+            {{ b.status_display }}
+          </span>
+        </td>
+      </ng-container>
+
+      <!-- Actions -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let b">
+          <div class="actions-cell">
+            <!-- Check In — only for confirmed -->
+            <button mat-icon-button
+                    *ngIf="b.status === 'confirmed'"
+                    matTooltip="Check In"
+                    (click)="checkIn(b)">
+              <mat-icon>login</mat-icon>
+            </button>
+            <!-- Check Out — only for checked_in -->
+            <button mat-icon-button
+                    *ngIf="b.status === 'checked_in'"
+                    matTooltip="Check Out"
+                    (click)="checkOut(b)">
+              <mat-icon>logout</mat-icon>
+            </button>
+            <!-- Edit — only for confirmed -->
+            <button mat-icon-button
+                    *ngIf="b.status === 'confirmed'"
+                    matTooltip="Edit"
+                    (click)="openEditBooking(b)">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <!-- Cancel — for confirmed or checked_in -->
+            <button mat-icon-button
+                    color="warn"
+                    *ngIf="b.status === 'confirmed' || b.status === 'checked_in'"
+                    matTooltip="Cancel"
+                    (click)="cancel(b)">
+              <mat-icon>cancel</mat-icon>
+            </button>
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell no-data" [attr.colspan]="displayedColumns.length">
+          <mat-icon>calendar_month</mat-icon>
+          <p>No reservations found</p>
+        </td>
+      </tr>
+
+    </table>
+  </div>
+
+</div>

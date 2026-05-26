@@ -1,0 +1,69 @@
+<div class="dialog-wrap">
+  <div class="dialog-header">
+    <div class="dialog-title-block">
+      <div class="dialog-icon"><mat-icon>inventory_2</mat-icon></div>
+      <div>
+        <h2 class="dialog-title">Log Supply Usage</h2>
+        <p class="dialog-sub">Record housekeeping supplies used</p>
+      </div>
+    </div>
+    <button class="close-btn" (click)="onCancel()"><mat-icon>close</mat-icon></button>
+  </div>
+
+  <form [formGroup]="supplyForm" class="dialog-body">
+
+    <div class="field-wrap">
+      <label class="field-label">Item Name <span class="required">*</span></label>
+      <mat-form-field appearance="outline" class="full-width">
+        <input matInput formControlName="item_name" placeholder="e.g. Bed Sheets"/>
+        <mat-error *ngIf="supplyForm.get('item_name')?.hasError('required')">Required</mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <div class="field-wrap">
+        <label class="field-label">Quantity <span class="required">*</span></label>
+        <mat-form-field appearance="outline" class="full-width">
+          <input matInput type="number" formControlName="quantity" min="1"/>
+        </mat-form-field>
+      </div>
+      <div class="field-wrap">
+        <label class="field-label">Unit</label>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-select formControlName="unit">
+            <mat-option *ngFor="let u of units" [value]="u">{{ u }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="field-wrap">
+      <label class="field-label">Room (optional)</label>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-select formControlName="room" placeholder="Select room">
+          <mat-option [value]="null">— No specific room —</mat-option>
+          <mat-option *ngFor="let r of rooms" [value]="r.id">
+            Room {{ r.number }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="field-wrap">
+      <label class="field-label">Notes</label>
+      <mat-form-field appearance="outline" class="full-width">
+        <textarea matInput formControlName="notes" rows="2"
+                  placeholder="Additional notes..."></textarea>
+      </mat-form-field>
+    </div>
+
+  </form>
+
+  <div class="dialog-footer">
+    <button class="btn-cancel" (click)="onCancel()">Cancel</button>
+    <button class="btn-save" [disabled]="supplyForm.invalid" (click)="onSave()">
+      <mat-icon>add</mat-icon>
+      Log Supply
+    </button>
+  </div>
+</div>

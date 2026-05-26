@@ -1,0 +1,194 @@
+.customers-page { max-width: 1100px; }
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 28px;
+}
+.page-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 38px;
+  font-weight: 600;
+  color: var(--text-inverse);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.page-sub { font-size: 13px; color: var(--text-muted); }
+
+/* Stats */
+.stats-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.stat-chip {
+  background: var(--primary-light);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 110px;
+  transition: var(--transition);
+}
+.stat-chip:hover { border-color: var(--border-strong); }
+.stat-number {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1;
+}
+.stat-label {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* Filters */
+.filters-bar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  background: var(--primary-light);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+}
+.filter-field { flex: 1; min-width: 160px; }
+
+::ng-deep .filters-bar .mat-mdc-text-field-wrapper {
+  background: var(--primary) !important;
+}
+::ng-deep .filters-bar .mat-mdc-input-element,
+::ng-deep .filters-bar .mat-mdc-select-value-text {
+  color: var(--text-inverse) !important;
+}
+::ng-deep .filters-bar .mat-mdc-floating-label {
+  color: var(--text-muted) !important;
+}
+
+.clear-btn {
+  height: 56px;
+  white-space: nowrap;
+  color: var(--text-muted) !important;
+  border-color: var(--border-strong) !important;
+  font-family: 'DM Sans', sans-serif !important;
+}
+.clear-btn:hover {
+  color: var(--text-inverse) !important;
+  background: rgba(255,255,255,0.04) !important;
+}
+
+/* Table */
+.table-wrap {
+  background: var(--primary-light);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+.customers-table { width: 100%; }
+
+::ng-deep .customers-table .mat-mdc-header-row {
+  background: var(--primary-dark) !important;
+}
+::ng-deep .customers-table .mat-mdc-row {
+  background: var(--primary-light) !important;
+}
+
+/* Cells */
+.name-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 0;
+}
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-dark), var(--accent));
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+.name-info { display: flex; flex-direction: column; gap: 2px; }
+.full-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-inverse);
+}
+.gender-tag {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: capitalize;
+}
+
+.subtle-text {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.location-cell {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+.location-cell mat-icon {
+  font-size: 14px !important;
+  width: 14px !important;
+  height: 14px !important;
+  color: var(--accent);
+}
+
+.id-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.id-type-badge {
+  font-size: 10px;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+.id-number {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.actions-cell {
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+}
+
+.no-data {
+  text-align: center;
+  padding: 60px;
+  color: var(--text-muted);
+}
+.no-data mat-icon {
+  font-size: 40px !important;
+  width: 40px !important;
+  height: 40px !important;
+  margin-bottom: 12px;
+  opacity: 0.4;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+.no-data p { font-size: 14px; opacity: 0.6; }
