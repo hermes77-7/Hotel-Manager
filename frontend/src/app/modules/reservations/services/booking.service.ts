@@ -6,7 +6,7 @@ import { Booking } from '../../../shared/models/booking.model';
 
 @Injectable({ providedIn: 'root' })
 export class BookingService {
-  private apiUrl = `${environment.apiUrl}/api/reservations`;
+  private apiUrl = `${environment.apiUrl}/reservations`;
 
   constructor(private http: HttpClient) {}
 
@@ -14,35 +14,35 @@ export class BookingService {
     let params = new HttpParams();
     if (filters?.status) params = params.set('status', filters.status);
     if (filters?.search) params = params.set('search', filters.search);
-    return this.http.get<Booking[]>(`${this.apiUrl}/api/`, { params });
+    return this.http.get<Booking[]>(`${this.apiUrl}/`, { params });
   }
 
   getBooking(id: number): Observable<Booking> {
-    return this.http.get<Booking>(`${this.apiUrl}/api/${id}/`);
+    return this.http.get<Booking>(`${this.apiUrl}/${id}/`);
   }
 
   createBooking(booking: Booking): Observable<Booking> {
-    return this.http.post<Booking>(`${this.apiUrl}/api/`, booking);
+    return this.http.post<Booking>(`${this.apiUrl}/`, booking);
   }
 
   updateBooking(id: number, booking: Booking): Observable<Booking> {
-    return this.http.put<Booking>(`${this.apiUrl}/${id}/api/`, booking);
+    return this.http.put<Booking>(`${this.apiUrl}/${id}/`, booking);
   }
 
   deleteBooking(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/api/${id}/`);
+    return this.http.delete<void>(`${this.apiUrl}/${id}/`);
   }
 
   // Status transitions
   checkIn(id: number): Observable<Booking> {
-    return this.http.post<Booking>(`${this.apiUrl}/api/${id}/check_in/`, {});
+    return this.http.post<Booking>(`${this.apiUrl}/${id}/check_in/`, {});
   }
 
   checkOut(id: number): Observable<Booking> {
-    return this.http.post<Booking>(`${this.apiUrl}/api/${id}/check_out/`, {});
+    return this.http.post<Booking>(`${this.apiUrl}/${id}/check_out/`, {});
   }
 
   cancel(id: number): Observable<Booking> {
-    return this.http.post<Booking>(`${this.apiUrl}/api/${id}/cancel/`, {});
+    return this.http.post<Booking>(`${this.apiUrl}/${id}/cancel/`, {});
   }
 }

@@ -6,7 +6,7 @@ import { CleaningTask, HygieneReport, SupplyLog } from '../../../shared/models/h
 
 @Injectable({ providedIn: 'root' })
 export class HousekeepingService {
-  private baseUrl = `${environment.apiUrl}/api/housekeeping`;
+  private baseUrl = `${environment.apiUrl}/housekeeping`;
 
   constructor(private http: HttpClient) {}
 
