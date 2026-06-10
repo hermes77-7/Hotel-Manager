@@ -142,7 +142,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Allow Angular to talk to Django
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:4200",
+    "https://hotel-manager-static.onrender.com",
 ]
 
 # JWT Authentication
