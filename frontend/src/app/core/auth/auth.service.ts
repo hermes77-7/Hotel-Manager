@@ -33,7 +33,7 @@ export class AuthService {
 
   login(username: string, password: string): Observable<LoginResponse> {
     return this.http
-      .post<LoginResponse>(`${this.apiUrl}/api/auth/login/`, { username, password })
+      .post<LoginResponse>(`${this.apiUrl}/auth/login/`, { username, password })
       .pipe(
         tap((response) => {
           localStorage.setItem('access_token', response.access);
@@ -45,7 +45,7 @@ export class AuthService {
 
   fetchCurrentUser(): void {
     this.http
-      .get<User>(`${this.apiUrl}/api/auth/me/`)
+      .get<User>(`${this.apiUrl}/auth/me/`)
       .pipe(
         tap((user) => {
           localStorage.setItem('current_user', JSON.stringify(user));
