@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: aurum-hotel-api
+    env: python
+    region: oregon
+    rootDir: backend
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn config.wsgi:application"
+    envVars:
+      - key: DJANGO_ENV
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALLOWED_HOSTS
+        sync: false        # You'll fill this in after deployment
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false        # You'll fill this in after deployment
+      - key: DATABASE_URL
+        fromDatabase:
+          name: aurum-hotel-db
+          property: connectionString
+
+databases:
+  - name: aurum-hotel-db
+    region: oregon
+    plan: free
