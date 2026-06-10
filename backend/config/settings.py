@@ -1,4 +1,7 @@
 from datetime import timedelta
+from pathlib import Path
+import os
+
 """
 Django settings for config project.
 
@@ -10,8 +13,6 @@ https://docs.djangoproject.com/en/6.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
-
-from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -32,6 +33,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -71,10 +73,11 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],  # ← add this
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
@@ -131,7 +134,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATICFILES_DIR = [
+    os.path.join(BASE_DIR, 'static'),
+]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Allow Angular to talk to Django
 CORS_ALLOWED_ORIGINS = [
@@ -180,4 +187,107 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'AUTH_HEADER_TYPES': ('Bearer',),
+}
+
+
+JAZZMIN_SETTINGS = {
+    # ── Branding ──────────────────────────────────
+    "site_title":        "Aurum Admin",
+    "site_header":       "Aurum Hotel",
+    "site_brand":        "⬡ AURUM",
+    "site_logo":         None,
+    "welcome_sign":      "Welcome to the Aurum Hotel Management System",
+    "copyright":         "Aurum Hotel ERP",
+
+    # ── Top Menu ──────────────────────────────────
+    "topmenu_links": [
+        {
+            "name":  "View Site",
+            "url":   "http://localhost:4200",
+            "new_window": True
+        },
+        {
+            "name":  "API Docs",
+            "url":   "/api/docs/",
+            "new_window": True
+        },
+    ],
+
+    # ── User Menu ─────────────────────────────────
+    "usermenu_links": [
+        {
+            "name":        "API Docs",
+            "url":         "/api/docs/",
+            "new_window":  True,
+            "icon":        "fas fa-book"
+        },
+    ],
+
+    # ── Sidebar ───────────────────────────────────
+    "show_sidebar":            True,
+    "navigation_expanded":     True,
+    "hide_apps":               [],
+    "hide_models":             [],
+
+    # ── Icons ─────────────────────────────────────
+    "icons": {
+        "auth":                      "fas fa-users-cog",
+        "accounts.user":             "fas fa-user-tie",
+        "rooms.room":                "fas fa-bed",
+        "customers.customer":        "fas fa-user-friends",
+        "reservations.booking":      "fas fa-calendar-check",
+        "billing.invoice":           "fas fa-file-invoice-dollar",
+        "food.menuitem":             "fas fa-utensils",
+        "food.foodorder":            "fas fa-concierge-bell",
+        "food.orderitem":            "fas fa-list",
+        "housekeeping.cleaningtask": "fas fa-broom",
+        "housekeeping.hygienereport":"fas fa-clipboard-check",
+        "housekeeping.supplylog":    "fas fa-boxes",
+    },
+    "default_icon_parents": "fas fa-chevron-circle-right",
+    "default_icon_children": "fas fa-circle",
+
+    # ── UI Tweaks ─────────────────────────────────
+    "related_modal_active":       True,
+    "custom_js":                  None,
+    "use_google_fonts_cdn":       True,
+    "show_ui_builder":            False,
+
+    # ── Search ────────────────────────────────────
+    "search_model": ["accounts.user", "customers.customer", "rooms.room"],
+
+    # ── Change view ───────────────────────────────
+    "changeform_format": "horizontal_tabs",
+}
+
+JAZZMIN_UI_TWEAKS = {
+    "navbar_small_text":    False,
+    "footer_small_text":    False,
+    "body_small_text":      False,
+    "brand_small_text":     False,
+    "brand_colour":         "navbar-dark",
+    "accent":               "accent-warning",
+    "navbar":               "navbar-dark",
+    "no_navbar_border":     True,
+    "navbar_fixed":         True,
+    "layout_boxed":         False,
+    "footer_fixed":         False,
+    "sidebar_fixed":        True,
+    "sidebar":              "sidebar-dark-warning",
+    "sidebar_nav_small_text": False,
+    "sidebar_disable_expand": False,
+    "sidebar_nav_child_indent": True,
+    "sidebar_nav_compact_style": False,
+    "sidebar_nav_legacy_style": False,
+    "sidebar_nav_flat_style": False,
+    "theme":                "darkly",
+    "default_theme_mode" : 'dark',
+    "button_classes": {
+        "primary":   "btn-primary",
+        "secondary": "btn-secondary",
+        "info":      "btn-info",
+        "warning":   "btn-warning",
+        "danger":    "btn-danger",
+        "success":   "btn-success",
+    },
 }

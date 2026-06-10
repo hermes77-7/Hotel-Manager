@@ -1,18 +1,546 @@
-{% extends "admin/base.html" %}
+{% extends 'admin/base_site.html' %}
 {% load static %}
 
-{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
-
-{% block branding %}
-<h1 id="site-name">
-    <a href="{% url 'admin:index' %}">
-        <!-- You can replace this text with your actual project name -->
-        Admin Portal
-    </a>
-</h1>
-{% endblock %}
-
 {% block extrastyle %}
-    {{ block.super }}
-    <link rel="stylesheet" type="text/css" href="{% static 'css/custom_admin.css' %}">
+{{ block.super }}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --gold:          #C9A86A;
+  --gold-light:    #D9BC87;
+  --gold-dark:     #A8863F;
+  --bg:            #1F1F1F;
+  --bg-dark:       #141414;
+  --bg-light:      #2A2A2A;
+  --bg-card:       #242424;
+  --text:          #F5F5F0;
+  --text-muted:    #8A8A8A;
+  --border:        rgba(201,168,106,0.15);
+  --border-strong: rgba(201,168,106,0.3);
+}
+
+/* ── Base ────────────────────────────────────────── */
+body,
+.wrapper,
+.content-wrapper,
+.main-sidebar,
+.main-header,
+.main-footer {
+  font-family: 'DM Sans', sans-serif !important;
+  color: var(--text) !important;
+}
+body { background: var(--bg) !important; }
+
+/* ── Brand ───────────────────────────────────────── */
+.brand-link,
+.brand-link:hover {
+  font-family: 'Cormorant Garamond', serif !important;
+  font-size: 20px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.12em !important;
+  color: var(--gold) !important;
+  background: var(--bg-dark) !important;
+  border-bottom: 1px solid var(--border) !important;
+}
+
+/* ── Navbar ──────────────────────────────────────── */
+.main-header.navbar,
+.main-header {
+  background: var(--bg-dark) !important;
+  border-bottom: 1px solid var(--border) !important;
+}
+.navbar-nav .nav-link,
+.nav-item .nav-link { color: var(--text-muted) !important; }
+.navbar-nav .nav-link:hover { color: var(--gold) !important; }
+
+/* ── Sidebar ─────────────────────────────────────── */
+.main-sidebar,
+.sidebar {
+  background: var(--bg-dark) !important;
+  border-right: 1px solid var(--border) !important;
+}
+.sidebar .nav-link,
+.sidebar .nav-link p,
+.sidebar .nav-link i { color: var(--text-muted) !important; font-size: 13px !important; }
+.sidebar .nav-link:hover,
+.sidebar .nav-link:hover p,
+.sidebar .nav-link:hover i {
+  color: var(--text) !important;
+  background: rgba(255,255,255,0.04) !important;
+}
+.sidebar .nav-link.active,
+.sidebar .nav-link.active p,
+.sidebar .nav-link.active i {
+  color: var(--gold) !important;
+  background: rgba(201,168,106,0.1) !important;
+  border-left: 3px solid var(--gold) !important;
+}
+.nav-header {
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.1em !important;
+  color: #444 !important;
+  text-transform: uppercase !important;
+}
+
+/* ── Content ─────────────────────────────────────── */
+.content-wrapper,
+.content { background: var(--bg) !important; }
+
+/* ── Cards ───────────────────────────────────────── */
+.card {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3) !important;
+  color: var(--text) !important;
+}
+.card-header {
+  background: var(--bg-dark) !important;
+  border-bottom: 1px solid var(--border) !important;
+  border-radius: 10px 10px 0 0 !important;
+  color: var(--gold) !important;
+  font-family: 'Cormorant Garamond', serif !important;
+  font-size: 16px !important;
+}
+.card-body { color: var(--text) !important; }
+.card-footer {
+  background: var(--bg-dark) !important;
+  border-top: 1px solid var(--border) !important;
+}
+
+/* ── Headings ────────────────────────────────────── */
+h1, h2, h3, h4, h5, h6,
+.content-header h1 {
+  font-family: 'Cormorant Garamond', serif !important;
+  color: var(--text) !important;
+}
+
+/* ── Breadcrumbs ─────────────────────────────────── */
+.breadcrumb { background: transparent !important; }
+.breadcrumb-item a { color: var(--gold) !important; }
+.breadcrumb-item.active { color: var(--text-muted) !important; }
+.breadcrumb-item + .breadcrumb-item::before { color: #444 !important; }
+
+/* ── Tables ──────────────────────────────────────── */
+.table { color: var(--text) !important; background: var(--bg-card) !important; }
+.table > thead > tr > th {
+  background: var(--bg-dark) !important;
+  color: var(--text-muted) !important;
+  font-size: 10px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  font-weight: 600 !important;
+  border-color: var(--border) !important;
+}
+.table > tbody > tr > td {
+  color: var(--text) !important;
+  border-color: rgba(255,255,255,0.05) !important;
+}
+.table > tbody > tr:nth-child(odd) > td {
+  background: rgba(255,255,255,0.02) !important;
+}
+
+/* Result list */
+#result_list th,
+#result_list thead th,
+#result_list thead th a {
+  background: var(--bg-dark) !important;
+  color: var(--text-muted) !important;
+}
+#result_list tbody tr td {
+  color: var(--text) !important;
+  background: var(--bg-card) !important;
+}
+#result_list tbody tr:nth-child(odd) td {
+  background: rgba(255,255,255,0.02) !important;
+}
+#result_list tbody td a { color: var(--gold) !important; }
+#result_list tbody td a:hover { color: var(--gold-light) !important; }
+
+/* ── Forms & Inputs ──────────────────────────────── */
+.form-control,
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+input[type="url"],
+input[type="date"],
+input[type="datetime-local"],
+textarea,
+select {
+  background: var(--bg-dark) !important;
+  border: 1px solid var(--border-strong) !important;
+  color: var(--text) !important;
+  border-radius: 6px !important;
+  font-family: 'DM Sans', sans-serif !important;
+  font-size: 13px !important;
+}
+.form-control:focus,
+input:focus,
+textarea:focus,
+select:focus {
+  background: var(--bg-dark) !important;
+  border-color: var(--gold) !important;
+  color: var(--text) !important;
+  box-shadow: 0 0 0 2px rgba(201,168,106,0.2) !important;
+  outline: none !important;
+}
+.form-control::placeholder,
+input::placeholder,
+textarea::placeholder { color: #555 !important; }
+
+/* ── Select / Dropdown fixes ─────────────────────── */
+select,
+select option,
+select optgroup {
+  background: var(--bg-light) !important;
+  color: var(--text) !important;
+}
+.selector-available select,
+.selector-chosen select {
+  background: var(--bg-dark) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--border-strong) !important;
+}
+.selector h2 {
+  background: var(--bg-dark) !important;
+  color: var(--text-muted) !important;
+  border: 1px solid var(--border) !important;
+  font-size: 11px !important;
+}
+.selector-filter input {
+  background: var(--bg-dark) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--border-strong) !important;
+}
+
+/* Select2 */
+.select2-container--default .select2-selection--single,
+.select2-container--default .select2-selection--multiple {
+  background: var(--bg-dark) !important;
+  border: 1px solid var(--border-strong) !important;
+  color: var(--text) !important;
+  border-radius: 6px !important;
+}
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+  color: var(--text) !important;
+  font-family: 'DM Sans', sans-serif !important;
+}
+.select2-container--default .select2-selection--single .select2-selection__arrow b {
+  border-color: var(--gold) transparent transparent transparent !important;
+}
+.select2-dropdown {
+  background: var(--bg-light) !important;
+  border: 1px solid var(--border-strong) !important;
+  border-radius: 6px !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5) !important;
+}
+.select2-container--default .select2-results__option {
+  background: var(--bg-light) !important;
+  color: var(--text) !important;
+  font-family: 'DM Sans', sans-serif !important;
+  font-size: 13px !important;
+}
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+  background: rgba(201,168,106,0.15) !important;
+  color: var(--gold) !important;
+}
+.select2-container--default .select2-results__option[aria-selected=true] {
+  background: rgba(201,168,106,0.1) !important;
+  color: var(--gold) !important;
+}
+.select2-search--dropdown .select2-search__field {
+  background: var(--bg-dark) !important;
+  border: 1px solid var(--border-strong) !important;
+  color: var(--text) !important;
+  border-radius: 4px !important;
+}
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+  background: rgba(201,168,106,0.15) !important;
+  border: 1px solid var(--border-strong) !important;
+  color: var(--gold) !important;
+  border-radius: 4px !important;
+}
+
+/* ── Labels ──────────────────────────────────────── */
+label,
+.col-form-label,
+.form-group label {
+  color: var(--text-muted) !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  font-family: 'DM Sans', sans-serif !important;
+}
+.help { color: #555 !important; font-size: 11px !important; }
+
+/* ── Fieldsets ───────────────────────────────────── */
+fieldset {
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+  padding: 16px !important;
+  background: var(--bg-card) !important;
+}
+fieldset h2,
+fieldset legend {
+  font-family: 'Cormorant Garamond', serif !important;
+  color: var(--gold) !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  border-bottom: 1px solid var(--border) !important;
+  padding-bottom: 8px !important;
+}
+
+/* ── Inline forms ────────────────────────────────── */
+.inline-group {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+}
+.inline-group h2 {
+  background: var(--bg-dark) !important;
+  color: var(--gold) !important;
+  border-radius: 8px 8px 0 0 !important;
+  border-bottom: 1px solid var(--border) !important;
+}
+.inline-related h3 {
+  background: var(--bg-dark) !important;
+  color: var(--text-muted) !important;
+  border-bottom: 1px solid var(--border) !important;
+}
+
+/* ── Buttons ─────────────────────────────────────── */
+.btn, input[type="submit"], input[type="button"], .button {
+  font-family: 'DM Sans', sans-serif !important;
+  font-weight: 600 !important;
+  border-radius: 6px !important;
+  font-size: 12px !important;
+  transition: all 0.2s ease !important;
+}
+.btn-primary,
+.btn-primary:focus,
+input[type="submit"] {
+  background: var(--gold) !important;
+  border-color: var(--gold) !important;
+  color: #1F1F1F !important;
+}
+.btn-primary:hover,
+input[type="submit"]:hover {
+  background: var(--gold-light) !important;
+  border-color: var(--gold-light) !important;
+  color: #1F1F1F !important;
+}
+.btn-secondary, .btn-default {
+  background: #333 !important;
+  border-color: #444 !important;
+  color: var(--text) !important;
+}
+.btn-success {
+  background: #1A3A1A !important;
+  border-color: #2E7D32 !important;
+  color: #66BB6A !important;
+}
+.btn-danger {
+  background: #3A1A1A !important;
+  border-color: #8B2020 !important;
+  color: #EF5350 !important;
+}
+
+/* Object tools */
+.object-tools a,
+.object-tools a:link,
+.object-tools a:visited {
+  background: var(--gold) !important;
+  color: #1F1F1F !important;
+  font-weight: 600 !important;
+  border-radius: 6px !important;
+  font-size: 12px !important;
+  padding: 6px 14px !important;
+}
+.object-tools a:hover { background: var(--gold-light) !important; }
+
+/* ── Alerts ──────────────────────────────────────── */
+.alert-success, .messagelist li.success {
+  background: rgba(46,125,50,0.12) !important;
+  border-color: rgba(46,125,50,0.3) !important;
+  color: #66BB6A !important;
+  border-radius: 8px !important;
+}
+.alert-error, .alert-danger,
+.messagelist li.error,
+.errornote {
+  background: rgba(139,32,32,0.12) !important;
+  border-color: rgba(139,32,32,0.3) !important;
+  color: #EF5350 !important;
+  border-radius: 8px !important;
+}
+.alert-warning, .messagelist li.warning {
+  background: rgba(201,168,106,0.1) !important;
+  border-color: var(--border-strong) !important;
+  color: var(--gold) !important;
+  border-radius: 8px !important;
+}
+.errorlist li { color: #EF5350 !important; font-size: 12px !important; }
+
+/* ── Search bar ──────────────────────────────────── */
+#searchbar,
+#toolbar input[type="text"] {
+  background: var(--bg-dark) !important;
+  border: 1px solid var(--border-strong) !important;
+  color: var(--text) !important;
+  border-radius: 6px !important;
+  padding: 6px 12px !important;
+}
+#searchbar:focus,
+#toolbar input[type="text"]:focus {
+  border-color: var(--gold) !important;
+  box-shadow: 0 0 0 2px rgba(201,168,106,0.15) !important;
+  outline: none !important;
+}
+#toolbar input[type="submit"] {
+  background: var(--gold) !important;
+  color: #1F1F1F !important;
+  border: none !important;
+  border-radius: 6px !important;
+  font-weight: 600 !important;
+}
+
+/* ── Actions bar ─────────────────────────────────── */
+#changelist .actions {
+  background: var(--bg-dark) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 6px !important;
+  color: var(--text-muted) !important;
+}
+#changelist .actions select {
+  background: var(--bg-dark) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--border-strong) !important;
+}
+#changelist .actions label { color: var(--text-muted) !important; }
+
+/* ── Filters ─────────────────────────────────────── */
+#changelist-filter {
+  background: var(--bg-dark) !important;
+  border-left: 1px solid var(--border) !important;
+}
+#changelist-filter h2 {
+  background: var(--bg-dark) !important;
+  color: var(--gold) !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.1em !important;
+  padding: 12px 16px !important;
+  border-bottom: 1px solid var(--border) !important;
+}
+#changelist-filter h3 {
+  color: var(--text-muted) !important;
+  font-size: 10px !important;
+  text-transform: uppercase !important;
+}
+#changelist-filter a { color: var(--text-muted) !important; font-size: 13px !important; }
+#changelist-filter a:hover { color: var(--gold) !important; }
+#changelist-filter li.selected a { color: var(--gold) !important; font-weight: 600 !important; }
+
+/* ── Pagination ──────────────────────────────────── */
+.pagination .page-link {
+  background: var(--bg-card) !important;
+  border-color: var(--border) !important;
+  color: var(--text-muted) !important;
+}
+.pagination .page-item.active .page-link {
+  background: var(--gold) !important;
+  border-color: var(--gold) !important;
+  color: #1F1F1F !important;
+  font-weight: 600 !important;
+}
+.pagination .page-link:hover {
+  background: rgba(201,168,106,0.1) !important;
+  color: var(--gold) !important;
+}
+.paginator { color: var(--text-muted) !important; font-size: 12px !important; }
+.paginator a { color: var(--gold) !important; }
+
+/* ── Calendar ────────────────────────────────────── */
+.calendarbox, .clockbox {
+  background: var(--bg-light) !important;
+  border: 1px solid var(--border-strong) !important;
+  border-radius: 8px !important;
+}
+.calendar caption {
+  background: var(--bg-dark) !important;
+  color: var(--gold) !important;
+  font-weight: 600 !important;
+}
+.calendar th { background: var(--bg-dark) !important; color: var(--text-muted) !important; }
+.calendar td { color: var(--text) !important; }
+.calendar td a { color: var(--text) !important; }
+.calendar td a:hover,
+.calendar td.selected a {
+  background: rgba(201,168,106,0.15) !important;
+  color: var(--gold) !important;
+  border-radius: 4px !important;
+}
+
+/* ── Module ──────────────────────────────────────── */
+.module {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+}
+.module h2,
+.module caption {
+  background: var(--bg-dark) !important;
+  color: var(--gold) !important;
+  border-radius: 8px 8px 0 0 !important;
+  border-bottom: 1px solid var(--border) !important;
+  font-family: 'Cormorant Garamond', serif !important;
+}
+
+/* ── Footer ──────────────────────────────────────── */
+.main-footer {
+  background: var(--bg-dark) !important;
+  border-top: 1px solid var(--border) !important;
+  color: #444 !important;
+  font-size: 11px !important;
+}
+
+/* ── Login page ──────────────────────────────────── */
+body.login { background: var(--bg-dark) !important; }
+.login-box, .login-card {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4) !important;
+}
+.login-logo a {
+  font-size: 28px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.15em !important;
+  color: var(--gold) !important;
+  font-family: 'Cormorant Garamond', serif !important;
+}
+
+/* ── Links ───────────────────────────────────────── */
+a { color: var(--gold) !important; }
+a:hover { color: var(--gold-light) !important; }
+
+/* ── Misc ────────────────────────────────────────── */
+p, span, td, li { font-family: 'DM Sans', sans-serif !important; }
+.text-muted { color: var(--text-muted) !important; }
+hr { border-color: var(--border) !important; }
+input[type="checkbox"] { accent-color: var(--gold) !important; }
+
+/* ── Scrollbar ───────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(201,168,106,0.2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+
+</style>
 {% endblock %}
