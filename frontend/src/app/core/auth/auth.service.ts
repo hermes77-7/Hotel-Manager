@@ -24,26 +24,45 @@ export class AuthService {
   currentUserSubject = new BehaviorSubject<User | null>(null);
   currentUser$ = this.currentUserSubject.asObservable();
 
-  constructor(private http: HttpClient, private router: Router) {
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+  ) {
     this.loadUserFromStorage();
   }
 
   login(username: string, password: string): Observable<LoginResponse> {
     return this.http
-      .post<LoginResponse>(`${this.apiUrl}/auth/login/`, { username, password })
+      .post<LoginResponse>(`${this.apiUrl}/api/auth/login/`, { username, password })
       .pipe(
-        tap(response => {
+        tap((response) => {
           localStorage.setItem('access_token', response.access);
           localStorage.setItem('refresh_token', response.refresh);
           this.fetchCurrentUser();
-        })
+        }),
       );
+  }
+
+  fetchCurrentUser(): void {
+    this.http
+      .get<User>(`${this.apiUrl}/api/auth/me/`)
+      .pipe(
+        tap((user) => {
+          localStorage.setItem('current_user', JSON.stringify(user));
+          this.currentUserSubject.next(user);
+        }),
+        catchError(() => {
+          this.loadUserFromCache();
+          return of(null);
+        }),
+      )
+      .subscribe();
   }
 
   logout(): void {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
-    localStorage.removeItem('current_user');  // ← clear cached user too
+    localStorage.removeItem('current_user'); // ← clear cached user too
     this.currentUserSubject.next(null);
     this.router.navigate(['/auth/login']);
   }
@@ -54,23 +73,6 @@ export class AuthService {
 
   isLoggedIn(): boolean {
     return !!this.getToken();
-  }
-
-  fetchCurrentUser(): void {
-    this.http.get<User>(`${this.apiUrl}/auth/me/`)
-      .pipe(
-        tap(user => {
-          // Cache the user in localStorage so it survives server restarts
-          localStorage.setItem('current_user', JSON.stringify(user));
-          this.currentUserSubject.next(user);
-        }),
-        catchError(() => {
-          // Django is offline — load user from cache instead
-          this.loadUserFromCache();
-          return of(null);
-        })
-      )
-      .subscribe();
   }
 
   private loadUserFromStorage(): void {

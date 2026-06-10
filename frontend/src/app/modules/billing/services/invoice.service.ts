@@ -6,7 +6,7 @@ import { Invoice } from '../../../shared/models/invoice.model';
 
 @Injectable({ providedIn: 'root' })
 export class InvoiceService {
-  private apiUrl = `${environment.apiUrl}/billing`;
+  private apiUrl = `${environment.apiUrl}/api/billing`;
 
   constructor(private http: HttpClient) {}
 
@@ -14,25 +14,25 @@ export class InvoiceService {
     let params = new HttpParams();
     if (filters?.status) params = params.set('status', filters.status);
     if (filters?.search) params = params.set('search', filters.search);
-    return this.http.get<Invoice[]>(`${this.apiUrl}/`, { params });
+    return this.http.get<Invoice[]>(`${this.apiUrl}/api/`, { params });
   }
 
   getInvoice(id: number): Observable<Invoice> {
-    return this.http.get<Invoice>(`${this.apiUrl}/${id}/`);
+    return this.http.get<Invoice>(`${this.apiUrl}/api/${id}/`);
   }
 
   updateInvoice(id: number, invoice: Partial<Invoice>): Observable<Invoice> {
-    return this.http.patch<Invoice>(`${this.apiUrl}/${id}/`, invoice);
+    return this.http.patch<Invoice>(`${this.apiUrl}/api/${id}/`, invoice);
   }
 
   markPaid(id: number, paymentMethod: string): Observable<Invoice> {
-    return this.http.post<Invoice>(`${this.apiUrl}/${id}/mark_paid/`, {
+    return this.http.post<Invoice>(`${this.apiUrl}/api/${id}/mark_paid/`, {
       payment_method: paymentMethod,
     });
   }
 
   recordPayment(id: number, amount: number, paymentMethod: string): Observable<Invoice> {
-    return this.http.post<Invoice>(`${this.apiUrl}/${id}/record_payment/`, {
+    return this.http.post<Invoice>(`${this.apiUrl}/api/${id}/record_payment/`, {
       amount,
       payment_method: paymentMethod,
     });
