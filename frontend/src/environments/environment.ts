@@ -1,4 +1,4 @@
 export const environment = {
-  production: false,
-  apiUrl: 'https://hotel-manager-0qg6.onrender.com',
+    production: false,
+    apiUrl: 'http://localhost:8000/api'
 };
